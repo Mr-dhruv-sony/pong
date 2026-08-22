@@ -306,7 +306,7 @@
 
   let p1 = { x: 15, y: canvas.height/2 - PADDLE_HEIGHT/2, w: PADDLE_WIDTH, h: PADDLE_HEIGHT, dy: 0 };
   let p2 = { x: canvas.width - 15 - PADDLE_WIDTH, y: canvas.height/2 - PADDLE_HEIGHT/2, w: PADDLE_WIDTH, h: PADDLE_HEIGHT, dy: 0 };
-  let ball = { x: canvas.width/2, y: canvas.height/2, size: BALL_SIZE, dx: 4, dy: 0, speed: 5 };
+  let ball = { x: canvas.width/2, y: canvas.height/2, size: BALL_SIZE, dx: 3, dy: 0, speed: 3, maxSpeed: 7, accel: 1.01 };
   let trail = [];
 
   document.getElementById('scoreP1').textContent = '0';
@@ -397,16 +397,18 @@
     // Paddle collision
     if (ball.x <= p1.x + p1.w && ball.y + ball.size >= p1.y && ball.y <= p1.y + p1.h) {
       const hitPos = (ball.y + ball.size/2 - p1.y) / PADDLE_HEIGHT;
-      ball.dx = Math.abs(ball.dx) * 1.03;
-      ball.dy = (hitPos - 0.5) * 8;
+      ball.dx = Math.abs(ball.dx) * ball.accel;
+      if (Math.abs(ball.dx) > ball.maxSpeed) ball.dx = ball.maxSpeed;
+      ball.dy = (hitPos - 0.5) * 7;
       ball.x = p1.x + p1.w;
       if (soundEnabled) playHit();
     }
 
     if (ball.x + ball.size >= p2.x && ball.y + ball.size >= p2.y && ball.y <= p2.y + p2.h) {
       const hitPos = (ball.y + ball.size/2 - p2.y) / PADDLE_HEIGHT;
-      ball.dx = -Math.abs(ball.dx) * 1.03;
-      ball.dy = (hitPos - 0.5) * 8;
+      ball.dx = -Math.abs(ball.dx) * ball.accel;
+      if (Math.abs(ball.dx) > ball.maxSpeed) ball.dx = -ball.maxSpeed;
+      ball.dy = (hitPos - 0.5) * 7;
       ball.x = p2.x - ball.size;
       if (soundEnabled) playHit();
     }
@@ -445,9 +447,9 @@
     }
 
     // Speed cap
-    const maxSpeed = 12;
+    const maxSpeed = 7;
     if (Math.abs(ball.dx) > maxSpeed) ball.dx = Math.sign(ball.dx) * maxSpeed;
-    if (Math.abs(ball.dy) > 8) ball.dy = Math.sign(ball.dy) * 8;
+    if (Math.abs(ball.dy) > 6) ball.dy = Math.sign(ball.dy) * 6;
   }
 
   function draw() {
